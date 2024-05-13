@@ -1,0 +1,12 @@
+cohere==5.2.4
+fitz==0.0.1.dev2
+Flask==3.0.3
+huggingface_hub==0.22.2
+llama_index==0.10.28
+rapidfuzz==3.6.1
+Requests==2.31.0
+semanticscholar==0.8.0
+torch==2.2.1
+tqdm==4.66.2
+transformers==4.39.3
+Werkzeug==3.0.2

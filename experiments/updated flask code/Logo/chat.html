@@ -1,0 +1,161 @@
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>ResearchLens</title>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css')}}"/>
+	</head>
+
+	<body>
+    <div class="container-fluid h-100">
+        <div class="row justify-content-center h-100">
+            <!-- Column for PDF Viewer --><!-- Column for PDF Upload and Viewer -->
+            <div class="col-md-6" style="padding: 20px;">
+                <div style="margin-bottom: 20px;">
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <input type="file" name="pdf_file" id="pdfUpload" accept="application/pdf" />
+                        <input type="button" value="Upload" id="uploadBtn">
+                    </form>
+
+                    <div class="pdf-viewer" style="height: 85vh; border-radius: 10px; overflow: hidden;">
+                        <embed id="pdfViewer" type="application/pdf" width="100%" height="100%"></embed>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column for Chatbot -->
+            <div class="col-md-6 chat">
+                <div class="card">
+                    <div class="card-header msg_head">
+                        <div class="d-flex bd-highlight">
+                            <div class="img_cont">
+                                <img src="logo1.png" class="rounded-circle user_img">
+                                <span class="online_icon"></span>
+                            </div>
+                            <div class="user_info">
+                                <span>ResearchLens</span>
+                                <p>Let's dive into the paper</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="messageFormeight" class="card-body msg_card_body">
+                        <!-- Messages will be shown here -->
+                    </div>
+                    <div class="card-footer">
+                        <form id="messageArea" class="input-group">
+                            <input type="text" id="text" name="msg" placeholder="Type your message..." autocomplete="off" class="form-control type_msg" required/>
+                            <div class="input-group-append">
+                                <button type="submit" id="send" class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<style>
+    #uploadBtn {
+        background-color: #4CAF50; /* Green background */
+        border: none; /* Remove borders */
+        color: white; /* White text */
+        padding: 10px 24px; /* Some padding */
+        cursor: pointer; /* Pointer/hand icon */
+        border-radius: 5px; /* Rounded corners */
+        font-size: 16px; /* Increase font size */
+        transition: all 0.3s; /* Smooth transitions for hover effects */
+        outline: none; /* Remove outline */
+    }
+
+    #uploadBtn:hover {
+        background-color: #45a049; /* Darker shade of green */
+        box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19); /* Add shadow on hover */
+    }
+
+    /* Add this to make the input file button look similar to the upload button, if desired */
+    input[type="file"] {
+        padding: 10px;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    input[type="file"]:hover {
+        background-color: #ddd; /* Light grey */
+    }
+</style>
+
+
+		<script>
+			$(document).ready(function() {
+				$("#messageArea").on("submit", function(event) {
+					const date = new Date();
+					const hour = date.getHours();
+					const minute = date.getMinutes();
+					const str_time = hour+":"+minute;
+					var rawText = $("#text").val();
+
+					var userHtml = '<div class="d-flex justify-content-end mb-4"><div class="msg_cotainer_send">' + rawText + '<span class="msg_time_send">'+ str_time + '</span></div><div class="img_cont_msg"><img src="https://i.ibb.co/d5b84Xw/Untitled-design.png" class="rounded-circle user_img_msg"></div></div>';
+					
+					$("#text").val("");
+					$("#messageFormeight").append(userHtml);
+
+					$.ajax({
+						data: {
+							msg: rawText,	
+						},
+						type: "POST",
+						url: "/get",
+					}).done(function(data) {
+						var botHtml = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg"><img src="https://i.ibb.co/fSNP7Rz/icons8-chatgpt-512.png" class="rounded-circle user_img_msg"></div><div class="msg_cotainer">' + data + '<span class="msg_time">' + str_time + '</span></div></div>';
+						$("#messageFormeight").append($.parseHTML(botHtml));
+					});
+					event.preventDefault();
+				});
+			});
+			 // JavaScript to handle PDF upload and display
+document.getElementById('pdfUpload').addEventListener('change', function(event) {
+    var file = event.target.files[0];
+    if (file.type === "application/pdf") {
+        var url = URL.createObjectURL(file);
+        document.getElementById('pdfViewer').src = url;
+    } else {
+        alert("Please upload a PDF file.");
+    }
+});
+
+document.getElementById('uploadBtn').addEventListener('click', function() {
+    var fileInput = document.getElementById('pdfUpload');
+    var file = fileInput.files[0];
+    if (!file) {
+        alert("Please select a file.");
+        return;
+    }
+
+    var formData = new FormData();
+    formData.append('pdf_file', file);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/upload', true);
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            console.log('File uploaded successfully.');
+        } else {
+            console.error('Upload failed.');
+        }
+    };
+    xhr.send(formData);
+});
+
+		</script>
+        
+    </body>
+</html>
