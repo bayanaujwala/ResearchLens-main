@@ -45,10 +45,3 @@ To use the chat app just run the `run.sh` script from the project root.
 | src/refextract | Modules for extracting references and downloading metadata                |
 | src/server     | UI and backend code for the chat application                              |
 | src/anystyle   | Simple ruby server for anystyle ruby library.                             |
-
-## Contributors
-
-Abhishek Reddy Andluru \
-Rohit Sisir Sahoo \
-Surya Krishnamurthy \
-Venkata Sai Ujwala Bayana
